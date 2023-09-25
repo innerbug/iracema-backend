@@ -1,0 +1,43 @@
+version: '3.3'
+
+services:
+  api:
+    image: iracema-api
+    container_name: iracema-api
+    build: .
+    restart: always
+    ports:
+      - ${PORT:-3333}:3333
+    expose:
+      - ${PORT:-3333}
+    networks:
+      - iracema-network
+    links:
+      - db
+    depends_on:
+      - db
+    volumes:
+      - .:/usr/app
+      - /usr/app/node_modules
+
+  db:
+    image: postgres
+    container_name: iracema-db
+    restart: always
+    ports:
+      - ${DB_PORT}:5432
+    expose:
+      - ${DB_PORT}
+    networks:
+      - iracema-network
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE}
+    volumes:
+      - /var/lib/postgres/data
+
+networks:
+  iracema-network:
+    driver: bridge
+    name: iracema-network
